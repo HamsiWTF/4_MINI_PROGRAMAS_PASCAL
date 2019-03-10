@@ -1,42 +1,59 @@
-PROGRAM super_calculadora;
-USES
-  CRT;
+PROGRAM Calculadora;
+VAR
+    numero1, numero2, selector: integer;
 
-FUNCTION Suma(n1,n2:real):real;
- BEGIN
-   Suma:= n1+n2;
- END;
-
-
-FUNCTION Resta(n1,n2:real):real;
- BEGIN
-   Resta:= n1-n2;
- END;
-
-
-FUNCTION Multiplicacion(n1,n2:real):real;
- BEGIN
-   Multiplicacion:= n1*n2;
- END;
-
-FUNCTION Divisor(n:real):real;
- BEGIN
-    WHILE (n=0) DO BEGIN
-      writeln ('Proporcione un numero distinto de 0');
-      readln (n);
+FUNCTION Suma (n1, n2:integer):integer;
+    BEGIN
+        Suma:=n1+n2;
     END;
-    Divisor:=n;
- END;
-
-FUNCTION Division(n1,n2:real):real;
- BEGIN
-   n2:= Divisor(n2);
-   Division := n1/n2;
- END;
-
-FUNCTION Potencia(n1,n2:real):real;
+FUNCTION Resta (n1, n2:integer):integer;
+    BEGIN
+        Resta:=n1-n2;
+    END;
+FUNCTION Multiplicacion (n1, n2:integer):integer;
+    BEGIN
+        Multiplicacion:=n1*n2;
+    END;
+FUNCTION Division (n1, n2:integer):real;
+    BEGIN
+        Division:=n1/n2;
+    END;
+FUNCTION SumaLenta (n1, n2:integer):integer;
+    BEGIN
+        WHILE (n1>0)OR(n1<0) DO BEGIN
+            n1 := n1 - 1;
+            n2:= n2 + 1;
+        END;
+        SumaLenta:=n2;
+    END;
+FUNCTION RestaLenta (n1, n2:integer):integer;
+    BEGIN
+        WHILE (n2>0)OR(n2<0) DO BEGIN
+            n2 := n2 - 1;
+            n1:= n1 - 1;
+        END;
+        RestaLenta:=n1;
+    END;
+FUNCTION MultiplicacionPorSumas (n1, n2:integer):integer;
+    VAR
+        aux:integer;
+    BEGIN
+    aux:=0;
+        FOR n2:=n2 downto 1 DO BEGIN
+            aux:=aux+n1;
+        END;
+        MultiplicacionPorSumas:=aux;
+    END;
+FUNCTION DivisionPorRestas (n1, n2:integer):integer;
+    BEGIN
+        IF (n2>n1) THEN
+            DivisionPorRestas:=0
+        ELSE
+            DivisionPorRestas:=DivisionPorRestas(n1-n2, n2)+1;
+    END;
+FUNCTION Potencia(n1,n2:integer):integer;
  VAR
-   aux:real;
+   aux:integer;
  BEGIN
    aux:=1;
    WHILE (n2 > 0) DO BEGIN
@@ -45,10 +62,9 @@ FUNCTION Potencia(n1,n2:real):real;
    END;
    Potencia:= aux;
  END;
-
-FUNCTION MultiplicacionRusa (n1, n2: longInt): longInt;
+FUNCTION MultiplicacionRusa (n1, n2: integer): integer; //o integer o longInt en ambos sitios
  VAR
-   aux: longInt;
+   aux: integer; //o integer o longInt
  BEGIN
    aux:= 0;
    WHILE (n2 <> 0) DO BEGIN
@@ -60,103 +76,69 @@ FUNCTION MultiplicacionRusa (n1, n2: longInt): longInt;
    MultiplicacionRusa:=aux;
  END;
 
-FUNCTION OperacionValida (l: char): boolean;
- BEGIN
-   OperacionValida := (l = '+') OR (l =  '-') OR (l = '*') OR (l = '/') OR (l = 'P') OR (l = 'M');
- END;
-
-FUNCTION OperacionARealizar: char;
- VAR
-   aux: char;   valido: boolean;
- BEGIN
-   REPEAT
-     writeln ('Podras sumar, restar, multiplicar, dividir, elevar o calcular la multiplicacion rusa');
-     writeln ('Introduciendo +, -, *, /, p, m');
-     readln (aux);
-     aux:= UPCASE (aux);
-   UNTIL OperacionValida (aux);
-   OperacionARealizar := aux;
- END;
-
-FUNCTION Calculadora(n1, n2:real): real;
- VAR
-   r: real;
-   letra: char;
- BEGIN
-    letra:= OperacionARealizar;
-    CASE letra OF
-       '+': r:= Suma (n1,n2);
-       '-': r:= Resta (n1,n2);
-       '*': r:= Multiplicacion (n1,n2);
-       '/': r:= Division (n1,n2);
-       'P': r:= Potencia (n1,n2);
-       'M': r:= MultiplicacionRusa(ROUND(n1),ROUND(n2));
-     END; {CASE}
-   Calculadora := r;
- END;
-
-PROCEDURE LeerDosNumeros (VAR n1, n2: real);
- BEGIN
-    writeln ('Proporcione dos numeros');
-    readln (n1, n2);
- END;
-
-FUNCTION LeerUnNumero: real;
-VAR
-   n: real;
- BEGIN
-    writeln ('Proporcione el segundo operando');
-    readln (n);
-    LeerUnNumero:=n;
- END;
-
-PROCEDURE MensajeBienvenida;
- BEGIN
-   writeln ('Bienvenido a nuestra calculadora');
-   writeln ('Pulse 0 para usarla. Otra tecla servira para salir');
- END;
-
-PROCEDURE MensajeContinuar;
- BEGIN
-   writeln ('Desea seguir operando?');
-   writeln ('Pulse 1 para conservar el resultado o 2 para resetear la calculadora');
-   writeln ('Cualquier otra tecla servira para salir');
- END;
-
 PROCEDURE Menu;
- VAR
-   final, opcion : integer;
-   numero1, numero2, resultado:real;
-   salir, seguir : boolean;
- BEGIN
-   MensajeBienvenida;
-   readln (final);
-   salir := final <> 0;
-   WHILE (NOT salir) DO BEGIN
-      LeerDosNumeros(numero1, numero2);
-      resultado := Calculadora (numero1, numero2);
-      writeln (resultado:0:2);
-       REPEAT
-         MensajeContinuar;
-         readln (opcion);
-         seguir := (opcion = 1) OR (opcion = 2);
-         CASE opcion OF
-           1: resultado := Calculadora (resultado, LeerUnNumero);
-           2: BEGIN
-               LeerDosNumeros(numero1, numero2);
-               resultado := Calculadora (numero1, numero2);
-              END
-           ELSE
-              salir := NOT seguir;
-         END; {case}
-         IF NOT salir THEN
-           writeln (resultado:0:2);
-       UNTIL (NOT seguir);
-   END;{WHILE}
-   writeln ('Hasta pronto');
- END; {Menu}
+    BEGIN
+        writeln('Que operacion desea realizar?');
+        writeln('1-Suma');
+        writeln('2-Resta');
+        writeln('3-Multiplicacion');
+        writeln('4-Division');
+        writeln('5-Potencia');
+        writeln('6-Suma lenta');
+        writeln('7-Resta lenta');
+        writeln('8-Multiplicacion por sumas');
+        writeln('9-Divison por restas');
+        writeln('10-Multiplicacion rusa');
+        writeln('0-Salir');
+    END;
+PROCEDURE RecogerDatos(VAR n1,n2: integer);
+    BEGIN
+        writeln ('Dame dos numeros');
+        readln(n1,n2);
+    END;
+BEGIN
+    REPEAT
+        RecogerDatos(numero1,numero2);
+        Menu;
+        readln(selector);
+        CASE selector OF
+            1:
+                writeln(Suma(numero1,numero2));
+            2:
+                writeln(Resta(numero1,numero2));
+            3:
+                writeln(Multiplicacion(numero1,numero2));
+            4:
+                BEGIN
+                    IF(numero2=0) THEN
+                        writeln('Infinito')
+                    ELSE
+                        writeln(Division(numero1,numero2));
+                END;
+            5:
+                BEGIN
+                    IF(numero2=0)AND(numero1=0) THEN
+                        writeln('Infinito')
+                    ELSE IF (numero2<0) THEN
+                        writeln('1/', Potencia(numero1,numero2))
+                    ELSE
+                        writeln(Potencia(numero1,numero2));
+                END;
+            6:
+                writeln(SumaLenta(numero1,numero2));
+            7:
+                writeln(RestaLenta(numero1,numero2));
+            8:
+                writeln(MultiplicacionPorSumas(numero1,numero2));
+            9:
+                writeln(DivisionPorRestas(numero1,numero2));
+            10:
+                writeln(MultiplicacionRusa(numero1,numero2))
 
-BEGIN {PP}
-  Menu;
-  READKEY;
+            ELSE
+                writeln('Selecciona una operacion correcta')
+        END;
+    UNTIL (selector=0);
+    readln();
 END.
+
